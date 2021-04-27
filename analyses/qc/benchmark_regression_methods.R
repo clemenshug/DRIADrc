@@ -147,8 +147,33 @@ cor_all <- res_all %>%
     .groups = "drop"
   )
 
-cor_all %>%
+histogram_50_random <- cor_all %>%
   unchop(cor_mat) %>%
   ggplot(aes(cor_mat, color = method)) +
-    geom_histogram(fill = NA)
+    geom_histogram(fill = NA) +
+    theme_minimal() +
+    labs(
+      x = "Kendall correlation with true labels", y = "Count",
+      title = "50 random gene sets (200 genes)"
+    ) +
+    scale_x_continuous(limits = c(0, 1))
 
+dir.create(here("qc_plots"), showWarnings = FALSE)
+ggsave(
+  here("qc_plots", "tau_histogram_50_random_gene_sets.pdf"),
+  histogram_50_random,
+  width = 5, height = 3
+)
+
+table_timings_50_random <- gridExtra::tableGrob(
+  summary(timings, unit = "s") %>%
+    mutate(across(where(is.numeric), signif, digits = 2)),
+  rows = NULL,
+  theme = gridExtra::ttheme_default()
+)
+
+ggsave(
+  here("qc_plots", "tau_timings_table_50_random_gene_sets.pdf"),
+  table_timings_50_random,
+  width = 7, height = 2
+)
