@@ -2,6 +2,7 @@ library(DRIAD)
 library(tidyverse)
 library(here)
 library(qs)
+library(ordinalRidge)
 
 synapser::synLogin()
 syn <- synExtra::synDownloader(here("data"))
@@ -23,10 +24,9 @@ run_gs_job <- function(task_id, gene_sets) {
       XX <- task %>% dplyr::select(any_of(gs)) %>% as.matrix()
 
       tryCatch({
-        preds <- OrdinalLogisticBiplot::pordlogist(
+        OrdinalLogisticBiplot::pordlogist(
           Y, XX, penalization = 0.1, tol = 1e-04, maxiter = 200, show = FALSE
         )
-        preds$pred[, 1]
       },
       error = function(e) {
         NULL
@@ -100,7 +100,7 @@ dge_gmt <- map(
   unnest(gene_sets)
 
 library(furrr)
-plan(multisession(workers = 8))
+plan(multisession(workers = 10))
 plan(sequential)
 
 dge_tasks <- dge_gmt %>%
@@ -131,7 +131,7 @@ dge_res_neat <- dge_res %>%
   ) %>%
   dplyr::select(-genes) %>%
   mutate(
-    res = map(res, 1)
+    res = map(res, ~.x[[1]]$fitted.values[, 6])
   )
 
 prediction_task_labels <- prediction_tasks_all %>%
@@ -141,10 +141,18 @@ prediction_task_labels <- prediction_tasks_all %>%
 
 dge_res_cor <- dge_res_neat %>%
   mutate(
+    rank_score = map2_dbl(
+      brain_region, res,
+      function(reg, perf) {
+        # browser()
+        evaluate_ranking(as.integer(prediction_task_labels[[reg]]), perf)
+      }
+    ),
     tau = map2_dbl(
       brain_region, res,
       function(reg, perf) {
-        cor(perf, as.integer(prediction_task_labels[[reg]]), method = "kendall")
+        # browser()
+        cor(as.integer(prediction_task_labels[[reg]]), perf, method = "kendall")
       }
     )
   ) %>%
@@ -152,17 +160,22 @@ dge_res_cor <- dge_res_neat %>%
 
 write_csv(
   dge_res_cor,
-  file.path(wd, "dge_res_tau.csv.gz")
+  file.path(wd, "dge_res_scores.csv.gz")
 )
 
 # from tau_background.R
-background_predictions <- qread(file.path(wd, "pordlogist_background_predictions.qs"))
+background_predictions <- qread(file.path(wd, "pordlogist_background_predictions_probabilities.qs"))
+
+plan(multisession(workers = 8))
 
 background_predictions_tau <- background_predictions %>%
   mutate(
-    tau = future_map2_dbl(
+    scores = future_map2(
       brain_region, prediction,
-      ~cor(as.integer(prediction_task_labels[[.x]]), .y, method = "kendall"),
+      ~list(
+        tau = cor(as.integer(prediction_task_labels[[.x]]), .y, method = "kendall"),
+        rank_score = evaluate_ranking(prediction_task_labels[[.x]], .y)
+      ),
       .progress = TRUE,
       .options = furrr_options(
         seed = 42
@@ -171,18 +184,36 @@ background_predictions_tau <- background_predictions %>%
   ) %>%
   dplyr::select(-prediction)
 
-background_predictions_tau_plot <- background_predictions_tau %>%
+qsave(
+  background_predictions_tau,
+  file.path(wd, "background_predictions_scores_raw.qs")
+)
+
+background_predictions_scores <- background_predictions_tau %>%
+  mutate(
+    rank_score = map_dbl(scores, "rank_score"),
+    tau = map_dbl(scores, "tau")
+  ) %>%
+  dplyr::select(-scores) %>%
+  pivot_longer(c(rank_score, tau), names_to = "score_type", values_to = "score")
+
+write_csv(
+  background_predictions_scores,
+  file.path(wd, "background_predictions_scores.csv.gz")
+)
+
+background_predictions_tau_plot <- background_predictions_scores %>%
   filter(gene_set_size %in% c(25, 50, 100, 200, 300)) %>%
-  ggplot(aes(tau, color = fct_inseq(as.character(gene_set_size)))) +
-    geom_density() +
-    facet_wrap(vars(brain_region)) +
+  ggplot(aes(score, color = fct_inseq(as.character(gene_set_size)))) +
+    geom_density(aes(y = stat(scaled))) +
+    facet_grid(vars(brain_region), vars(score_type)) +
     scale_x_continuous(limits = c(0, 1)) +
     theme_minimal() +
     labs(color = "Gene set size")
 
 ggsave(
-  file.path(wd, "background_predictions_tau_density.pdf"),
-  background_predictions_tau_plot, width = 6, height = 3
+  file.path(wd, "background_predictions_scores_density.pdf"),
+  background_predictions_tau_plot, width = 6, height = 5
 )
 
 background_gene_set_sizes <- background_predictions_tau[["gene_set_size"]] %>%
@@ -192,7 +223,8 @@ M <- syn("syn11801537") %>% read_csv(col_types=cols()) %>%
   mutate_at( "name", str_to_lower ) %>%
   dplyr::select( LINCSID = lincs_id, URL = link, Drug = name )
 
-dge_res_p <- dge_res_cor %>%
+dge_res_p <- dge_res_cor  %>%
+  pivot_longer(c(rank_score, tau), names_to = "score_type", values_to = "score") %>%
   mutate(
     background_gene_set_size = cut(
       gene_set_size,
@@ -203,27 +235,27 @@ dge_res_p <- dge_res_cor %>%
     }
   ) %>%
   inner_join(
-    background_predictions_tau %>%
+    background_predictions_scores %>%
       drop_na() %>%
-      group_by(brain_region, dataset, gene_set_size) %>%
-      summarize(background_taus = list(tau), .groups = "drop"),
-    by = c("brain_region", "dataset", "background_gene_set_size" = "gene_set_size")
+      group_by(brain_region, dataset, gene_set_size, score_type) %>%
+      summarize(background_scores = list(score), .groups = "drop"),
+    by = c("brain_region", "dataset", "background_gene_set_size" = "gene_set_size", "score_type")
   ) %>%
   mutate(
     p = map2_dbl(
-      background_taus, tau,
+      background_scores, score,
       ~mean(.x > .y)
     )
   ) %>%
-  dplyr::select(-background_taus) %>%
+  dplyr::select(-background_scores) %>%
   bind_rows(
-    dplyr::select(., experiment, drug, brain_region, p) %>%
-      pivot_wider(id_cols = c(experiment, drug), names_from = brain_region, values_from = p) %>%
+    dplyr::select(., experiment, drug, brain_region, score_type, p) %>%
+      pivot_wider(id_cols = c(experiment, drug, score_type), names_from = brain_region, values_from = p) %>%
       rowwise() %>%
       mutate(across(where(is.numeric), pmax, 0.0005)) %>%
       mutate(p = 1 / mean(1 / c_across(where(is.numeric)))) %>%
       ungroup() %>%
-      dplyr::transmute(experiment, drug, brain_region = "aggregated", p)
+      dplyr::transmute(experiment, drug, score_type, brain_region = "aggregated", p)
   ) %>%
   left_join(
     dplyr::select(M, LINCSID, drug_name = Drug),
@@ -239,7 +271,8 @@ top_p_heatmap <- dge_res_p %>%
   transmute(
     drug_name = paste0(drug_name, " (", str_sub(experiment, start = -1L, end = -1L), ")"),
     p_log = -log10(p),
-    brain_region
+    brain_region,
+    score_type
   ) %>%
   arrange(desc(p_log)) %>%
   mutate(
@@ -249,7 +282,8 @@ top_p_heatmap <- dge_res_p %>%
   filter(as.integer(drug_name) > 30) %>%
   ggplot(aes(brain_region, drug_name, fill = p_log)) +
     geom_tile() +
-    scale_fill_viridis_c()
+    scale_fill_viridis_c() +
+    facet_wrap(~score_type)
 
 ggsave(
   file.path(wd, "top_p_heatmap.pdf"),
@@ -259,7 +293,7 @@ ggsave(
 p_histogram <- dge_res_p %>%
   ggplot(aes(p)) +
     geom_histogram() +
-    facet_wrap(vars(brain_region))
+    facet_grid(vars(brain_region), vars(score_type))
 
 ggsave(
   file.path(wd, "p_histogram.pdf"),
