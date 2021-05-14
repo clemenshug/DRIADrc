@@ -1,0 +1,52 @@
+﻿name,reason,comment,source
+OXYBUTYNIN,toxic,"In particular, oxybutynin has consistently been shown to cause deterioration in memory",https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2734922/
+RISPERIDONE,studied,This retrospective study demonstrates that risperidone appears to be efficacious in the treatment of clinically significant positive and negative symptoms in patients with AD.,https://pubmed.ncbi.nlm.nih.gov/11263718/
+TELMISARTAN,studied,Researchers believe telmisartan can slow the progression of Alzheimer’s by controlling blood flow,https://www.alzheimers.gov/clinical-trials/telmisartan-prevent-alzheimers-african-americans
+BEXAROTENE,studied,Bexarotene therapy ameliorates behavioral deficits and induces functional and molecular changes in very-old Triple Transgenic Mice model of Alzheimer´s disease,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0223578
+PROGESTERONE,natural product,,
+CLOTRIMAZOLE,studied,"MCZ treatment significantly attenuated cognitive impairment, suppressed iNOS and cyclooxygenase-2 expression, and activation of astrocyte and microglial BV2 cells",https://www.nature.com/articles/s41419-020-2619-5
+CHOLECALCIFEROL,natural product,,
+SUVOREXANT,studied,FDA approved for insomnia in AD,https://www.neurologylive.com/view/suvorexant-now-indicated-for-treatment-of-insomnia-in-alzheimer-disease
+AGOMELATINE,studied,"Agomelatine is effective on improving behavioral and psychological symptoms of dementia, no matter in depression, sleep disturbance, delusion, hallucination, or aggression",https://www.ajgponline.org/article/S1064-7481(19)30145-9/abstract
+DROPERIDOL,unsuitable,Commonly given as sedative in emergency medicine,https://medicalxpress.com/news/2021-04-droperidol-effective-sedation-medication-agitation.html
+RIMONABANT,unsuitable,"Associated with an increased risk of anxiety, depression, and suicide.",https://www.nature.com/articles/nrcardio.2010.148
+AMOXAPINE,studied,"Taken together, our study suggests that amoxapine, though no longer a first-line drug for the treatment of depression, may be beneficial for AD",https://www.nature.com/articles/s41598-017-04144-3
+NORETHINDRONE,natural product,,
+LEUPROLIDE,studied,These data indicate that cognitive function is preserved in patients treated with high dose Lupron who were already using AChEIs. The positive interaction between Lupron and AChEIs warrants further investigation for the treatment of AD.,https://pubmed.ncbi.nlm.nih.gov/25310993/
+BENZTROPINE,unsuitable,A robust association between some classes of anticholinergic drugs and future dementia incidence was observed.,https://www.bmj.com/content/361/bmj.k1315
+ROSIGLITAZONE,studied,Rosiglitazone has a neutral effect on the risk of dementia in type 2 diabetes patients,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6535054/
+CLOSANTEL,unsuitable,Toxic,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5129234/
+MIFEPRISTONE,studied,Failed AD trial,https://www.clinicaltrials.gov/ct2/show/study/NCT00105105
+PREDNISOLONE,studied,Failed AD trial,https://pubmed.ncbi.nlm.nih.gov/11061280/
+PENTAGASTRIN,natural product,,
+ESTRADIOL,natural product,,
+LIOTHYRONINE,natural product,,
+SOMATOSTATIN,natural product,,
+FASIGLIFAM,unsuitable,Liver toxicity,https://www.fiercebiotech.com/biotech/takeda-announces-termination-of-fasiglifam-tak-875-development
+MURAGLITAZAR,unsuitable,Adverse events in trials,https://jamanetwork.com/journals/jama/fullarticle/201927
+SILDENAFIL,studied,Trials in the making,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7242821/
+PRANLUKAST,studied,Trial of close analog MONTELUKAST in progress,https://www.alzheimers.gov/clinical-trials/montelukast-therapy-alzheimers-disease
+TARANABANT,unsuitable,Serious CNS side effects,https://blogs.sciencemag.org/pipeline/archives/2008/03/12/taranabant_in_trouble
+TELCAGEPANT,unsuitable,Liver toxicity,https://www.clinicaltrials.gov/ct2/show/NCT00797667
+PROPRANOLOL,studied,"Overall, these data further strengthen the potential of propranolol as a therapeutic agent for AD.",https://academic.oup.com/ijnp/article/16/10/2245/653042
+SEGLITIDE,unsuitable,Serious side effects,https://www.sciencedirect.com/topics/pharmacology-toxicology-and-pharmaceutical-science/seglitide
+KISSPEPTIN-10,studied,"These results suggest that KP peptides are neuroprotective against Aβ, IAPP, and PrP peptides via a receptor independent action involving direct binding to the amyloid peptides.",https://pubs-acs-org.ezp-prod1.hul.harvard.edu/doi/full/10.1021/cn300045d
+SEROTONIN,natural product,,
+OXYTOCIN,natural product,,
+DIETHYLSTILBESTROL,natural product,,
+CLOZAPINE,studied,"This study suggests that as one of candidate for multi-target approach of AD treatment, clozapine is proposed as a therapeutic drug for treatment of AD patients.",https://pubmed.ncbi.nlm.nih.gov/26742522/
+ISTRADEFYLLINE,studied,"Moreover, in amyloid plaque-bearing mice, low-dose istradefylline treatment enhanced spatial memory and habituation",https://pubmed.ncbi.nlm.nih.gov/29100987/
+ERGOTAMINE,studied,This study offers DHEC not only as a new chemical moiety for selectively modulating the activity of γ-secretase but also a candidate for drug repositioning in Alzheimer’s disease.,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4644980/
+MELATONIN,natural product,,
+ALMOREXANT,unsuitable,Potential liver toxicity,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6086961/
+BROMOCRIPTINE,studied,AD clinical trial in progress,https://clinicaltrials.gov/ct2/show/NCT04413344
+BUPRENORPHINE,unsuitable,Addictive opioid,https://drugfree.org/drugs/prescription-pain-relievers-opioids
+ROLOFYLLINE,unsuitable,Seizures and stroke in trial,https://www.medscape.com/viewarticle/708267
+HALOPERIDOL,studied,Haloperidol (2–3 mg/d) decreased psychosis and disruptive behaviours in Alzheimer's disease although 20% of patients developed moderate to severe extrapyramidal side effects.,https://ebmh.bmj.com/content/2/2/48
+NIACIN,natural product,,
+ZAFIRLUKAST,studied,Trial of close analog MONTELUKAST in progress,https://www.alzheimers.gov/clinical-trials/montelukast-therapy-alzheimers-disease
+ALFUZOSIN,studied,The results suggest that tamsulosin for BPH is not associated with worsening of the cognitive decline in patients with AD.,https://journals.lww.com/md-journal/fulltext/2020/05290/the_impact_of_tamsulosin_on_cognition_in_alzheimer.34.aspx
+MEDROXYPROGESTERONE ACETATE,natural product,,
+CARVEDILOL,studied,AD clinical trial in progress,https://www.clinicaltrials.gov/ct2/show/NCT01354444
+MONTELUKAST,studied,AD clinical trial in progress,https://www.alzheimers.gov/clinical-trials/montelukast-therapy-alzheimers-disease
+HISTAMINE,natural product,,
