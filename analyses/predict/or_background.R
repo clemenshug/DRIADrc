@@ -6,7 +6,7 @@ library(here)
 library(batchtools)
 library(qs)
 
-wd <- file.path("/n", "scratch3", "users", "c", "ch305", "driad")
+wd <- here("analyses", "predict", "oridge")
 dir.create(wd)
 
 fnROSMAP <- wrangleROSMAP(file.path(wd, "rosmap"))
@@ -37,13 +37,12 @@ prediction_tasks_all <- tribble(
     id = paste0("prediction_task_", 1:n())
   )
 
-dir.create(file.path(wd, "data"))
 qsave(
   prediction_tasks_all,
-  file.path(wd, "data", paste0("prediction_tasks_all", ".qs"))
+  file.path(wd, paste0("prediction_tasks_all", ".qs"))
 )
 
-# prediction_tasks_all <- qread(file.path(wd, "data", paste0("prediction_tasks_all", ".qs")))
+# prediction_tasks_all <- qread(file.path(wd, paste0("prediction_tasks_all", ".qs")))
 
 pwalk(
   prediction_tasks_all,
@@ -52,7 +51,7 @@ pwalk(
     x <- list(task = task, pairs = pairs)
     qsave(
       x,
-      file.path(wd, "data", paste0(id, ".qs"))
+      file.path(wd, paste0(id, ".qs"))
       # compress = "xz"
     )
   }
@@ -60,11 +59,6 @@ pwalk(
 
 prediction_tasks <- prediction_tasks_all %>%
   select(-task, -pairs)
-
-qsave(
-  prediction_tasks,
-  here("data", paste0("prediction_tasks", ".qs"))
-)
 
 valid_gene_symbols <- prediction_tasks_all %>%
   pull(task) %>%
@@ -106,7 +100,7 @@ prediction_tasks_gene_sets <- prediction_tasks_all %>%
 
 qsave(
   prediction_tasks_gene_sets,
-  here("data", paste0("prediction_tasks_gene_sets", ".qs"))
+  file.path(wd, paste0("prediction_tasks_gene_sets", ".qs"))
 )
 
 # prediction_tasks_gene_sets <- qread(here("data", paste0("prediction_tasks_gene_sets", ".qs")))
@@ -185,18 +179,23 @@ prediction_tasks_outputs_raw <- reduceResultsDataTable(
 #   findDone()
 # )
 
+qsave(
+  prediction_tasks_outputs_raw,
+  file.path(wd, "oridge_background_predictions_raw.qs")
+)
+
 prediction_tasks_outputs <- prediction_tasks_outputs_raw %>%
   filter(map_lgl(result, negate(is.null))) %>%
   unnest(result) %>%
-  select(job_id = job.id, AUC) %>%
+  select(job_id = job.id, Set, AUC) %>%
   inner_join(
     prediction_tasks_gene_sets %>%
       mutate(job_id = seq_len(nrow(.))) %>%
-      select(job_id, brain_region, dataset, gene_set_size),
+      select(job_id, brain_region, dataset, gene_set_size, gene_set_seq_id),
     by = "job_id"
   )
 
 qsave(
   prediction_tasks_outputs,
-  file.path(wd, "oridge_background_predictions_probabilities.qs")
+  file.path(wd, "oridge_background_predictions.qs")
 )
